@@ -1,4 +1,4 @@
-import Sidebar from '@/components/Sidebar';
+import Sidebar from '@/components/sidebar';
 import { createClient } from '@/utils/supabase/server';
 
 export default async function ChatLayout({
