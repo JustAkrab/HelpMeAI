@@ -14,7 +14,7 @@ export default async function ChatLayout({
 
 	const fetchAllChats = async () => {
 		if (!user) return;
-		const { data, error } = await supabase.from('chats').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+		const { data, error } = await supabase.from('chats').select('*').eq('user_id', user.id);
 		if (error) {
 			console.log(error);
 		}

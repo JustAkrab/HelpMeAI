@@ -40,7 +40,7 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 			setMessages([
 				{
 					role: 'assistant',
-					content: 'Hello! I am *TubeAssist*, your personal assistant for all things Youtube. How can I help you today?',
+					content: 'Hello! I am **TubeAssist**, your personal assistant for all things Youtube. How can I help you today?',
 				},
 			]);
 		}
