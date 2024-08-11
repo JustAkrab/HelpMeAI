@@ -10,7 +10,7 @@ const ChatPage = async () => {
 		error,
 	} = await supabase.auth.getUser();
 	if (!user || error) {
-		redirect('/login');
+		redirect('/');
 	}
 	return (
 		<div className="fc w-full max-w-md py-24 mx-auto">
