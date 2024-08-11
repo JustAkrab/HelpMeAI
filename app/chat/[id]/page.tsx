@@ -1,4 +1,4 @@
-import Sidebar from '@/components/sidebar';
+import Sidebar from '@/components/Sidebar';
 import Chat from '@/components/chat';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
@@ -25,19 +25,16 @@ const ChatPage = async ({ params }: { params: { id: string } }) => {
 	}
 
 	const SupaMessages = await fetchChat();
-	if (SupaMessages && SupaMessages) {
+	if (SupaMessages && SupaMessages.length > 0) {
 		// if not user's chat, redirect to /chat
 		if (SupaMessages![0].user_id !== user.id) {
 			redirect('/chat');
 		}
+	} else {
+		redirect('/chat');
 	}
 
-	return (
-		<div className="fc w-full max-w-md py-24 mx-auto">
-			<Sidebar />
-			<Chat SupaMessages={SupaMessages![0].messages || []} id={id} user_id={id} />
-		</div>
-	);
+	return <Chat SupaMessages={SupaMessages![0].messages || []} id={id} user_id={id} />;
 };
 
 export default ChatPage;

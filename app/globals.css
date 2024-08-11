@@ -11,6 +11,7 @@
 		@apply flex-row flex justify-center items-center;
 	}
 	:root {
+		--gr: #18181a;
 		--background: 0 0% 100%;
 		--foreground: 222.2 84% 4.9%;
 		--card: 0 0% 100%;
@@ -73,4 +74,57 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+}
+
+.gradient-bg {
+	background: linear-gradient(45deg, #18181a, #d6355c, #262435, #772837);
+	background-size: 400% 400%;
+	animation: gradient-rotation 15s ease infinite;
+}
+
+@keyframes gradient-rotation {
+	0% {
+		background-position: 0% 50%;
+		--gr: #18181a;
+	}
+	50% {
+		background-position: 100% 50%;
+		--gr: #d6355c;
+	}
+	100% {
+		background-position: 0% 50%;
+		--gr: #18181a;
+	}
+}
+
+.blur-circle {
+	transition-duration: 3000ms;
+}
+.blur-circle {
+	animation-duration: 3000ms;
+}
+
+*::selection {
+	color: white;
+	background-color: black;
+}
+
+/* width */
+::-webkit-scrollbar {
+	width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	@apply bg-[#e2e2e2];
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	@apply bg-gray-600 rounded-full;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: #555;
 }

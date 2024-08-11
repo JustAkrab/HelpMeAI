@@ -6,8 +6,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-	title: 'HelpMeAI',
-	description: 'HelpMeAI is a platform for people to get customer support from AI.',
+	title: 'TubeAssist',
+	description: 'TubeAssist is a platform for people to get customer support from AI.',
 };
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={inter.className}>{children}</body>
+			<body className={inter.className + ' min-h-screen w-full'}>{children}</body>
 		</html>
 	);
 }

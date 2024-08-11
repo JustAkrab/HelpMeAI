@@ -38,11 +38,11 @@ export default function AuthenticationPage() {
 		<div className="container relative pt-36 sm:pt-0 h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
 			<div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
 				<div className="absolute inset-0 bg-[url(https://images.unsplash.com/photo-1680026548022-e76f693d0a62?q=80&w=1826&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] bg-cover" />
-				<div className="relative z-20 flex items-center text-lg font-medium">HelpMeAI</div>
+				<div className="relative z-20 flex items-center text-lg font-medium">TubeAssist</div>
 				<div className="relative z-20 mt-auto">
 					<blockquote className="space-y-2">
 						<p className="text-lg">
-							&ldquo;HelpMeAI is a great AI customer support tool that helps you to provide better customer service than ever
+							&ldquo;TubeAssist is a great AI customer support tool that helps you to provide better customer service than ever
 							before.&rdquo;
 						</p>
 						<footer className="text-sm">- someone in the future</footer>

@@ -1,4 +1,5 @@
 import Chat from '@/components/chat';
+import Sidebar from '@/components/Sidebar';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import React from 'react';
@@ -12,11 +13,8 @@ const ChatPage = async () => {
 	if (!user || error) {
 		redirect('/login');
 	}
-	return (
-		<div className="fc w-full max-w-md py-24 mx-auto">
-			<Chat user_id={user.id} />
-		</div>
-	);
+
+	return <Chat user_id={user.id} />;
 };
 
 export default ChatPage;

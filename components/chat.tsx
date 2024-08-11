@@ -2,9 +2,9 @@
 
 import { type CoreMessage } from 'ai';
 import { useEffect, useRef, useState } from 'react';
-import { continueConversation } from '@/app/chat/actions';
+import { continueConversation, renameChat } from '@/app/chat/actions';
 import { readStreamableValue } from 'ai/rsc';
-import Sidebar from './sidebar';
+import Sidebar from './Sidebar';
 import { createClient } from '@/utils/supabase/client';
 import { Input } from './ui/input';
 import { IoMdArrowRoundForward, IoMdChatbubbles } from 'react-icons/io';
@@ -40,15 +40,11 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 			setMessages([
 				{
 					role: 'assistant',
-					content: 'Hello! I am HelpMeAi, your personal assistant for all things Youtube. How can I help you today?',
+					content: 'Hello! I am *TubeAssist*, your personal assistant for all things Youtube. How can I help you today?',
 				},
 			]);
 		}
 	}, []);
-
-	useEffect(() => {
-		console.log(messages);
-	}, [messages]);
 
 	const supabase = createClient();
 
@@ -63,11 +59,79 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 
 	const router = useRouter();
 
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		if (!input) return;
+		const newMessages: CoreMessage[] = [...messages, { content: input, role: 'user' }];
+
+		setMessages(newMessages);
+
+		// either create new chat or update existing chat
+		if (id) {
+			await updateChat(newMessages);
+		}
+
+		setInput('');
+
+		const result = await continueConversation(newMessages);
+		let latestMessages: CoreMessage[] = [];
+
+		for await (const content of readStreamableValue(result)) {
+			setMessages([
+				...newMessages,
+				{
+					role: 'assistant',
+					content: content as string,
+				},
+			]);
+			latestMessages = [
+				{
+					role: 'system',
+					content:
+						"Your name is TubeAssist (always state your name in bold). You are a helpful AI Assistant that is specialized in helping customers of Youtube. You must be very respectful at all times, understand the user's requests, and provide accurate information and solutions at all times. If the user asks that is not related to Youtube help, please state that the user is going off topic, and that you are made specifically for help with Youtube. YOU MUST NOT PROVIDE ANY INFORMATION THAT IS NOT RELATED TO YOUTUBE, INSTEAD SAY THAT YOU ARE NOT PROGRAMMED TO HELP WITH THAT TOPIC.",
+				},
+				...newMessages,
+				{
+					role: 'assistant',
+					content: content as string,
+				},
+			];
+			if (id) {
+				await updateChat([
+					...newMessages,
+					{
+						role: 'assistant',
+						content: content as string,
+					},
+				]);
+			}
+		}
+
+		if (!id) {
+			const { data: iData, error: iError } = await supabase.from('chats').insert({ messages: JSON.stringify(latestMessages), user_id });
+			console.log(iData);
+			if (iError) {
+				console.error(iError);
+			}
+
+			// get the id of the chat and redirect to the chat page
+			const { data, error } = await supabase.from('chats').select('*').eq('user_id', user_id).order('created_at', { ascending: false });
+			if (error || !data) {
+				console.error(error);
+				return;
+			}
+			const chatId = data[0].id;
+			router.push(`/chat/${chatId}`);
+		}
+		if (id) {
+			renameChat(latestMessages, id);
+		}
+	};
+
 	return (
 		<>
-			<Sidebar />
-			<div className="fc w-full max-w-xl py-24 mx-auto stretch">
-				<div className="fc items-start gap-10">
+			<div className="fc w-full max-w-xl py-24 mx-auto">
+				<div className="fc items-start gap-10 w-full px-5 sm:px-10 pb-10">
 					{messages &&
 						messages.map((m, i) => {
 							if (m.role === 'system') return null;
@@ -89,87 +153,13 @@ export default function Chat({ user_id, SupaMessages, id }: { user_id: string; S
 				</div>
 				<div className="h-1 w-full" ref={messagesRef} />
 
-				<form
-					onSubmit={async (e) => {
-						e.preventDefault();
-						if (!input) return;
-						const newMessages: CoreMessage[] = [...messages, { content: input, role: 'user' }];
-
-						setMessages(newMessages);
-
-						// either create new chat or update existing chat
-						if (id) {
-							await updateChat(newMessages);
-						}
-
-						setInput('');
-
-						const result = await continueConversation(newMessages);
-						let latestMessages = [];
-
-						for await (const content of readStreamableValue(result)) {
-							console.log(content);
-							setMessages([
-								...newMessages,
-								{
-									role: 'assistant',
-									content: content as string,
-								},
-							]);
-							if (id) {
-								await updateChat([
-									...newMessages,
-									{
-										role: 'assistant',
-										content: content as string,
-									},
-								]);
-							} else {
-								latestMessages = [
-									{
-										role: 'system',
-										content:
-											"Your name is HelpMeAi (always state your name in bold). You are a helpful AI Assistant that is specialized in helping customers of Youtube. You must be very respectful at all times, understand the user's requests, and provide accurate information and solutions at all times. If the user asks that is not related to Youtube help, please state that the user is going off topic, and that you are made specifically for help with Youtube. YOU MUST NOT PROVIDE ANY INFORMATION THAT IS NOT RELATED TO YOUTUBE, INSTEAD SAY THAT YOU ARE NOT PROGRAMMED TO HELP WITH THAT TOPIC.",
-									},
-									...newMessages,
-									{
-										role: 'assistant',
-										content: content as string,
-									},
-								];
-							}
-						}
-
-						if (!id) {
-							const { data: iData, error: iError } = await supabase
-								.from('chats')
-								.insert({ messages: JSON.stringify(latestMessages), user_id });
-							console.log(iData);
-							if (iError) {
-								console.error(iError);
-							}
-
-							// get the id of the chat and redirect to the chat page
-							const { data, error } = await supabase
-								.from('chats')
-								.select('*')
-								.eq('user_id', user_id)
-								.order('created_at', { ascending: false });
-							if (error || !data) {
-								console.error(error);
-								return;
-							}
-							const chatId = data[0].id;
-							router.push(`/chat/${chatId}`);
-						}
-					}}
-				>
-					<div className="fixed bottom-10 w-full max-w-md fr gap-2 text-3xl">
+				<form className="w-full" onSubmit={handleSubmit}>
+					<div className="fixed py-5 sm:py-10 bottom-0 bg-gradient-to-t from-white from-75% to-transparent max-w-xl w-full px-5 sm:px-10 fr gap-2 text-3xl">
 						<label htmlFor="user">
 							<IoMdChatbubbles />
 						</label>
 
-						<Input className="w-full text-base" value={input} placeholder="Say something..." onChange={(e) => setInput(e.target.value)} />
+						<Input className="w-full text-base" value={input} placeholder="Ask for help..." onChange={(e) => setInput(e.target.value)} />
 						<Button type="submit">
 							<IoMdArrowRoundForward />
 						</Button>

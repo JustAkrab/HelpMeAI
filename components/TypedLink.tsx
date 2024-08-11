@@ -1,16 +1,16 @@
 import Link, { LinkProps } from 'next/link';
 import React from 'react';
-import {HelpMeAIRoute} from "@/lib/routes";
+import { TubeAssistRoute } from '@/lib/routes';
 
 type TypedLinkProps = Omit<LinkProps, 'href'> & {
-    href: HelpMeAIRoute;
-    children: React.ReactNode;
+	href: TubeAssistRoute;
+	children: React.ReactNode;
 };
 
 export const TypedLink = ({ href, children, ...props }: TypedLinkProps) => {
-    return (
-        <Link href={href} {...props}>
-            {children}
-        </Link>
-    );
+	return (
+		<Link href={href} {...props}>
+			{children}
+		</Link>
+	);
 };
