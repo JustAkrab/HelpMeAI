@@ -88,58 +88,53 @@ const Sidebar = ({ user, allChats }: { user: any; allChats: any }) => {
 							<IoAdd className="mr-2 text-xl" /> New Chat
 						</Link>
 						<AnimatePresence>
-							{chats
-								.sort((a, b) => a.created_at - b.created_at)
-								.map((chat) => {
-									console.log(chat.id);
-									return (
-										<motion.div
-											initial={{ opacity: 0 }}
-											animate={{ opacity: 1 }}
-											exit={{ opacity: 0 }}
-											key={chat.id}
-											className={cn(
-												'w-full px-3 text-sm py-2 fr justify-between rounded-xl transition-colors hover:bg-gray-600',
-												{
-													'bg-gray-700': pathname.includes(chat.id),
-												}
-											)}
-										>
-											<Link className="w-full" href={`/chat/${chat.id}`}>
-												{chat.name !== 'New Chat' ? <TextGenerateEffect words={chat.name} /> : 'New Chat'}
-											</Link>
-											<Popover>
-												<PopoverTrigger asChild>
-													<button>
-														<BsThreeDotsVertical />
+							{chats.map((chat) => {
+								console.log(chat.id);
+								return (
+									<motion.div
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
+										exit={{ opacity: 0 }}
+										key={chat.id}
+										className={cn('w-full px-3 text-sm py-2 fr justify-between rounded-xl transition-colors hover:bg-gray-600', {
+											'bg-gray-700': pathname.includes(chat.id),
+										})}
+									>
+										<Link className="w-full" href={`/chat/${chat.id}`}>
+											{chat.name !== 'New Chat' ? <TextGenerateEffect words={chat.name} /> : 'New Chat'}
+										</Link>
+										<Popover>
+											<PopoverTrigger asChild>
+												<button>
+													<BsThreeDotsVertical />
+												</button>
+											</PopoverTrigger>
+											<PopoverContent className="w-48">
+												<div>
+													<button
+														onClick={async (e) => {
+															e.stopPropagation();
+															const { data, error } = await supabase.from('chats').delete().eq('id', chat.id);
+															if (error) {
+																console.error(error);
+																return;
+															}
+
+															console.log(data);
+
+															router.push('/chat');
+														}}
+														className="w-full bg-white rounded-md fr px-2 py-1 gap-2 transition-colors hover:bg-gray-100"
+													>
+														<IoTrash className="text-red-500" />
+														<span className="w-full text-left">Delete</span>
 													</button>
-												</PopoverTrigger>
-												<PopoverContent className="w-48">
-													<div>
-														<button
-															onClick={async (e) => {
-																e.stopPropagation();
-																const { data, error } = await supabase.from('chats').delete().eq('id', chat.id);
-																if (error) {
-																	console.error(error);
-																	return;
-																}
-
-																console.log(data);
-
-																router.push('/chat');
-															}}
-															className="w-full bg-white rounded-md fr px-2 py-1 gap-2 transition-colors hover:bg-gray-100"
-														>
-															<IoTrash className="text-red-500" />
-															<span className="w-full text-left">Delete</span>
-														</button>
-													</div>
-												</PopoverContent>
-											</Popover>
-										</motion.div>
-									);
-								})}
+												</div>
+											</PopoverContent>
+										</Popover>
+									</motion.div>
+								);
+							})}
 						</AnimatePresence>
 					</div>
 					<form className="flex items-center p-2 rounded-lg group" action={logout}>
