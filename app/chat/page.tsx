@@ -1,5 +1,5 @@
 import Chat from '@/components/chat';
-import Sidebar from '@/components/Sidebar';
+import Sidebar from '@/components/sidebar';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import React from 'react';

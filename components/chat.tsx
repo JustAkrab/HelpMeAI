@@ -4,7 +4,7 @@ import { type CoreMessage } from 'ai';
 import { useEffect, useRef, useState } from 'react';
 import { continueConversation, renameChat } from '@/app/chat/actions';
 import { readStreamableValue } from 'ai/rsc';
-import Sidebar from './Sidebar';
+import Sidebar from './sidebar';
 import { createClient } from '@/utils/supabase/client';
 import { Input } from './ui/input';
 import { IoMdArrowRoundForward, IoMdChatbubbles } from 'react-icons/io';

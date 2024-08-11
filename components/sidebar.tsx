@@ -33,7 +33,8 @@ const Sidebar = ({ user, allChats }: { user: any; allChats: any }) => {
 				},
 				(payload) => {
 					if (payload.eventType === 'DELETE') {
-						setChats((prev) => prev.filter((chat) => chat.id !== payload.old.id));
+						// filter so that its only the user's chats
+						setChats((prev) => prev.filter((chat) => chat.id !== payload.old.id && chat.user_id === user.id));
 						return;
 					}
 					if (payload.eventType === 'UPDATE') {
@@ -45,6 +46,7 @@ const Sidebar = ({ user, allChats }: { user: any; allChats: any }) => {
 						});
 						return;
 					}
+					if (payload.new.user_id !== user.id) return;
 					setChats((prev) => [...prev, payload.new]);
 				}
 			)
