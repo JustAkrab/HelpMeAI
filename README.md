@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# TubeAssist (HelpMeAI)
+
+An AI-powered customer support chatbot focused exclusively on YouTube help topics, built with Next.js 14, the Vercel AI SDK, and Supabase.
+
+> Live app: https://help-me-ai.vercel.app
+> This repository is a fork of [Lemirq/HelpMeAI](https://github.com/Lemirq/HelpMeAI).
+
+## Overview
+
+TubeAssist lets signed-in users chat with an AI assistant that is scoped to answering questions about YouTube (as a creator or viewer). Responses are streamed in real time, conversations are saved per-user, and chat threads are automatically renamed based on their content. The assistant explicitly declines to help with anything outside of YouTube-related topics.
+
+## Features
+
+- **Streaming AI chat** — responses from Google's Gemini model (`gemini-1.5-flash-latest`) are streamed token-by-token using the Vercel AI SDK (`streamText`) and React Server Components (`createStreamableValue` / `readStreamableValue`), so replies appear incrementally rather than all at once.
+- **Scoped system prompt** — the assistant is instructed to only answer YouTube-related questions and to explicitly refuse anything off-topic.
+- **Auto-renaming chats** — after a chat has enough context, `generateText` is used to generate a short, descriptive title for the conversation, replacing the default "New Chat" label.
+- **Google OAuth authentication** — sign-in is handled via Supabase Auth's Google OAuth provider; the `/chat` route redirects unauthenticated users to `/login`.
+- **Persistent, real-time chat history** — each conversation is stored in a Supabase Postgres `chats` table (`id`, `user_id`, `name`, `messages`, `created_at`). The sidebar subscribes to Supabase Realtime so new, updated, and deleted chats reflect instantly without a page refresh.
+- **Chat management UI** — a collapsible sidebar (animated with Framer Motion) lists past chats, supports creating new chats and deleting existing ones via a popover menu.
+- **User reviews table** — a `reviews` table (`user_id`, `rate`, `message`) is defined in the schema for collecting user feedback/ratings.
+
+## Tech Stack
+
+- **Framework:** Next.js 14 (App Router), React 18, TypeScript
+- **AI:** Vercel AI SDK (`ai`, `ai/rsc`), `@ai-sdk/google` (Gemini)
+- **Auth & Database:** Supabase (`@supabase/ssr`) — Google OAuth, Postgres, Realtime subscriptions
+- **UI:** Tailwind CSS, shadcn/ui + Radix primitives, Headless UI, Framer Motion, Lucide/Heroicons/react-icons, `react-markdown`
+- **Deployment:** Vercel
+
+## Project Structure
+
+```
+├── app/
+│   ├── page.tsx              # Landing page
+│   ├── layout.tsx             # Root layout, fonts, metadata
+│   ├── chat/
+│   │   ├── page.tsx            # Chat route (auth-gated)
+│   │   └── actions.ts            # Server actions: continueConversation, renameChat
+│   └── login/
+│       ├── page.tsx             # Login page
+│       └── actions.ts             # Server actions: login (Google OAuth), logout
+├── components/
+│   ├── chat.tsx                # Chat UI, message list, input, streaming logic
+│   ├── sidebar.tsx               # Chat history sidebar with realtime updates
+│   └── ui/                        # shadcn/Radix UI primitives (Button, Input, Popover, etc.)
+├── lib/                          # Shared utilities (e.g. useMousePosition, cn helper)
+├── utils/supabase/                # Supabase client/server helper factories
+├── database.types.ts               # Generated Supabase schema types (chats, reviews tables)
+└── public/                          # Static assets
+```
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies and run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Create a `.env.local` file with:
 
-## Learn More
+```
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+GOOGLE_GENERATIVE_AI_API_KEY=your-google-ai-api-key
+```
 
-To learn more about Next.js, take a look at the following resources:
+You'll also need a Supabase project with:
+- Google OAuth configured as an auth provider
+- A `chats` table (`id`, `user_id`, `name`, `messages`, `created_at`) with Realtime enabled
+- A `reviews` table (`id`, `user_id`, `rate`, `message`, `created_at`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+The app is deployed on [Vercel](https://vercel.com). Pushing to `master` triggers a new deployment; environment variables must be configured in the Vercel project settings to match `.env.local`.
 
-## Deploy on Vercel
+## Attribution
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Forked from [Lemirq/HelpMeAI](https://github.com/Lemirq/HelpMeAI). Built on the [Next.js](https://nextjs.org/) `create-next-app` template.
